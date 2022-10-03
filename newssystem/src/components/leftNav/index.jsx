@@ -5,7 +5,8 @@ import "./nav-header.less";
 import { useEffect, useState } from "react";
 import { AppstoreOutlined } from "@ant-design/icons";
 import axios from "../../api/request";
-export default function LeftNav(props) {
+import {connect} from "react-redux"
+ function LeftNav(props) {
   const [items, setItems] = useState([]);
   const { citems } = props;
 
@@ -16,18 +17,22 @@ export default function LeftNav(props) {
     };
     const response = await axios.get("/rights?_embed=children");
     const newItems = response;
-    const {role:{rights}} = JSON.parse(localStorage.getItem("token"))
+    const {role:{rights}} =props.user
     //对请求回来的数据进行过滤,来判断是否展示在页面
     const renderMenu = (filterItems) => {
-      return filterItems.filter((newItem) => {
+      return filterItems.map((newItem) => {
         if (newItem.pagepermisson && rights.includes(newItem.key)) {
           if(newItem.children) {
             newItem.children= newItem.children.filter((item) => item.pagepermisson)
             return newItem
-          }else
-          return newItem;
+          }
+         else {
+          return newItem
+         }
+        } else {
+          return null
         }
-      });
+      }).filter((item) => {return  item!==null });
     };
     // console.log(rights);
     
@@ -72,8 +77,8 @@ export default function LeftNav(props) {
       </div>
       <div>
         <Menu
-          defaultSelectedKeys={["1"]}
-          defaultOpenKeys={["sub1"]}
+          defaultSelectedKeys={["/home"]}
+          // defaultOpenKeys={["sub1"]}
           mode="inline"
           theme="dark"
           items={items}
@@ -83,3 +88,10 @@ export default function LeftNav(props) {
     </div>
   );
 }
+export default connect(
+  (state) => { 
+    return {
+      user:state.user
+    }
+   }
+)(LeftNav)

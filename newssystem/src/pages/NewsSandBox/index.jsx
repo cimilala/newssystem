@@ -4,8 +4,9 @@ import LeftNav from "../../components/leftNav";
 import { Layout} from "antd";
 import { Navigate, Outlet,useLocation} from "react-router-dom";
 import TopHeader from "../../components/top-header/Top-header";
+import {connect} from "react-redux"
 const { Header, Footer, Sider, Content } = Layout;
-export default function NewsSandBox() {
+function NewsSandBox() {
   const {pathname} = useLocation()
  
 const [items,setItems] = useState([])
@@ -38,3 +39,10 @@ const [items,setItems] = useState([])
     </Layout>
   );
 }
+export default connect(
+  (state) => { 
+    return {
+      user:state.user
+    }
+  } 
+)(NewsSandBox)

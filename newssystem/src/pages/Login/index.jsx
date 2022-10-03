@@ -4,6 +4,7 @@ import { Button, Form, Input, message} from "antd"
 import "./login.less"
 import axios from "../../api/request";
 import { useNavigate } from "react-router-dom";
+import store from "../../redux/store"
 const Login = (props) => {
   const navigate = useNavigate()
   const onFinish =async (values) => {
@@ -20,6 +21,7 @@ const Login = (props) => {
       message.error("用户名或密码不正确")
    } else {
     localStorage.setItem("token",JSON.stringify(response[0]))
+    store.dispatch({type:"saveUser",data:response[0]})
     navigate("/")
    }
   };
@@ -66,7 +68,7 @@ const Login = (props) => {
       </Form.Item>
       <Form.Item>
         <Button type="primary" htmlType="submit" className="login-form-button">
-          Log in
+          Login
         </Button>
       </Form.Item>
     </Form>
@@ -76,4 +78,6 @@ const Login = (props) => {
   );
 };
 
-export default Login;
+
+  
+export default Login
