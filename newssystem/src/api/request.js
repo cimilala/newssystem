@@ -15,7 +15,7 @@ server.interceptors.request.use(
 
 server.interceptors.response.use(
     (res) => { 
-        return Promise.resolve(res.data)
+        return res.data
      },
     (err) => {
         console.log(err.message);

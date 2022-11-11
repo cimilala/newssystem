@@ -4,9 +4,11 @@ import { Button, Form, Input, message} from "antd"
 import "./login.less"
 import axios from "../../api/request";
 import { useNavigate } from "react-router-dom";
-import store from "../../redux/store"
+import {useDispatch} from "react-redux"
+import { saveUser } from "../../features/user/userSlice";
 const Login = (props) => {
   const navigate = useNavigate()
+  const dispatch = useDispatch()
   const onFinish =async (values) => {
    const response = await axios.get("/users",{
     params:{
@@ -20,16 +22,17 @@ const Login = (props) => {
     if(response.length === 0) {
       message.error("用户名或密码不正确")
    } else {
-    localStorage.setItem("token",JSON.stringify(response[0]))
-    store.dispatch({type:"saveUser",data:response[0]})
+    // localStorage.setItem("token",JSON.stringify(response[0]))
+    dispatch(saveUser(response[0]))
     navigate("/")
    }
   };
+
   return (
-    <div style={{background:'rgb(35,39,65)',height:"100%"}}>
+    <div style={{background:"rgb(35,39,65)",height:"100vh"}}>
    
      <div className="formContainer">
-     <div className="title">xxxx系统</div>
+     <div className="title">新闻管理系统</div>
      <Form
       name="normal_login"
       className="login-form"

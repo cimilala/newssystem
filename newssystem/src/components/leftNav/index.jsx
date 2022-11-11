@@ -5,11 +5,10 @@ import "./nav-header.less";
 import { useEffect, useState } from "react";
 import { AppstoreOutlined } from "@ant-design/icons";
 import axios from "../../api/request";
-import {connect} from "react-redux"
- function LeftNav(props) {
+import { useSelector } from "react-redux";
+export default function LeftNav() {
   const [items, setItems] = useState([]);
-  const { citems } = props;
-
+  const user = useSelector((state) => state.user.user)
   const getItems = async (first) => {
     const icons = {
       "/home": <AppstoreOutlined />,
@@ -17,7 +16,7 @@ import {connect} from "react-redux"
     };
     const response = await axios.get("/rights?_embed=children");
     const newItems = response;
-    const {role:{rights}} =props.user
+    const {role:{rights}} = user
     //对请求回来的数据进行过滤,来判断是否展示在页面
     const renderMenu = (filterItems) => {
       return filterItems.map((newItem) => {
@@ -57,7 +56,6 @@ import {connect} from "react-redux"
       }
     });
     setItems(renderMenu(newItems));
-    citems(renderMenu(newItems));
   };
   useEffect(() => {
     getItems();
@@ -75,7 +73,7 @@ import {connect} from "react-redux"
       <div>
         <h2 className="nav-header">全球新闻发布系统</h2>
       </div>
-      <div>
+      <div >
         <Menu
           defaultSelectedKeys={["/home"]}
           // defaultOpenKeys={["sub1"]}
@@ -88,10 +86,3 @@ import {connect} from "react-redux"
     </div>
   );
 }
-export default connect(
-  (state) => { 
-    return {
-      user:state.user
-    }
-   }
-)(LeftNav)

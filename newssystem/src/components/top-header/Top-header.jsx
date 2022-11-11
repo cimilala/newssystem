@@ -3,22 +3,17 @@ import {  UserOutlined } from '@ant-design/icons';
 import {Dropdown, Menu, Space,Button} from "antd"
 import "./top-header.less"
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 export default function TopHeader(props) {
- 
+  const user = useSelector((state) => state.user.user)
   const navigate = useNavigate()
-  const {role,username} = JSON.parse(localStorage.getItem("token"))
+   const {role,username} = user 
     const getTitle = () => {
         let title;
       props.items.forEach((item) => { 
         if(item.key ===props.pathname) {
           title = item.label
-        } else if(item.children) {
-          const cItem = item.children.find((cItem) =>props.pathname === cItem.key  )
-          if(cItem) {
-            title = cItem.label
-          }
         }
-       
         })
         return title
        }
@@ -39,19 +34,19 @@ export default function TopHeader(props) {
       )
   return (
     <div className='box'>
-        <div className="title">{getTitle()}</div>
+        <div className="title"> {getTitle()}</div>
         <div className="loginInfo">
-         <Dropdown overlay={menu}>
+      
         
       <Space>
-       
         <Button type='link'> 欢迎{username}回来!</Button>
-       
+        <Dropdown overlay={menu}>
         <Button
          type="primary" shape="circle" size="large" icon={ <UserOutlined />} style={{backgroundColor:"gray",border:"gray"}}/>
-      </Space>
+     
     
          </Dropdown>
+         </Space>
         </div>
     </div>
   )

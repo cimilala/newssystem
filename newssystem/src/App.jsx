@@ -1,64 +1,28 @@
-import React from 'react'
-import './App.less';
-import { useRoutes } from 'react-router-dom';
-import router from "./router"
-import LocalRouterMap from "./util/AuthRouter"
-import { useEffect, useState } from 'react';
-import axios from "./api/request"
-import {connect} from "react-redux"
- function App(props) {
-  console.log(props);
-  const [celement,setcElement] = useState(router)
-  console.log(celement);
-  const element = useRoutes(celement)
-  useEffect((first) => { 
-    if(props.user) {
-      const {role} = props.user
-      Promise.all([axios.get("/rights"), axios.get("/children")]).then((value) => {
-      const  backRouteList = [...value[0], ...value[1]];
-        const currentRouter = backRouteList.map((item) => {
-          if (
-            item.pagepermisson &&
-            LocalRouterMap[item.key] &&
-            role.rights.includes(item.key)
-          ) {
-            return {
-              path: item.key,
-              element: LocalRouterMap[item.key],
-            };
-          } else {
-            return null
-          }
-        }).filter((item) => {return  item !== null });
-    const newrouter = router.map((item) => { 
-        if(item.path === "/") {
-          item.children = [...item.children,...currentRouter]
-          return item
-        }else{
-          return item
-        }
-        
-      })
-    
-        setcElement(newrouter)
-      });
-    }
-     
-    
-  
-   },[props.user])
-  return (
-   <div style={{height:'100%'}}>
-   {element}
-   </div>
-   
-  )
-}
+import React from "react";
+import "./App.less";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "./pages/Login";
+import {  useSelector } from "react-redux";
+import NotFound from "./pages/NotFound";
+import NewsSandBox from "./pages/NewsSandBox";
 
-export default connect(
-  (state) => { 
-    return {
-      user:state.user
-    }
-  } 
-)(App)
+export default function App() {
+  const user = useSelector((state) => {
+    return state.user.user;
+  });
+  
+  return (
+    <div>
+      <Routes>
+        <Route path="/login" element={<Login />}></Route>
+
+        {user === "" ? (
+          <Route path="/" element={<Navigate to="/login" />}></Route>
+        ) : (
+          <Route path="/*" element={<NewsSandBox />}></Route>
+        )}
+        <Route path="*" element={<NotFound />}></Route>
+      </Routes>
+    </div>
+  );
+}

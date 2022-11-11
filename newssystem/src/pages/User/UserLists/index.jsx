@@ -4,9 +4,10 @@ import { Table, Space, Tooltip, Button, Switch, Modal } from "antd";
 import { EditOutlined, DeleteOutlined } from "@ant-design/icons";
 import { useEffect, useState, useRef } from "react";
 import UserForm from "../../../components/user-manage/UserForm";
+import { useDispatch } from "react-redux";
 export default function UserLists() {
  
-  const currentUser = JSON.parse(localStorage.getItem("token"))
+
   //初始化表格数据状态
   const [dataSource, setdataSource] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -18,6 +19,10 @@ export default function UserLists() {
   const [saveSelectItem, setSavaSelectItem] = useState({});
   const addForm = useRef();
   const updateForm = useRef();
+
+  const user = useDispatch((state) => { return state.user.user })
+
+  const currentUser = user
  
   //页面加载时发送请求,获取表格数据
   useEffect((first) => {
@@ -56,7 +61,7 @@ export default function UserLists() {
       }
    
     });
-  }, [currentUser.roleId ]);
+  }, [currentUser.roleId]);
   //定义表格列
   const columns = [
     {

@@ -1,48 +1,77 @@
 import React from "react";
-import {useState} from "react";
 import LeftNav from "../../components/leftNav";
-import { Layout} from "antd";
-import { Navigate, Outlet,useLocation} from "react-router-dom";
+import { Layout } from "antd";
+import { Navigate, Route, Routes,useLocation} from "react-router-dom";
 import TopHeader from "../../components/top-header/Top-header";
-import {connect} from "react-redux"
+import NotFound from "../NotFound";
+import { useEffect ,useState} from "react";
+import LocalRouterMap from "../../util/LocalRouterMap";
+import axios from "../../api/request"
+import { useSelector } from "react-redux";
+
 const { Header, Footer, Sider, Content } = Layout;
-function NewsSandBox() {
-  const {pathname} = useLocation()
+export default function NewsSandBox() {
+
+  const { pathname } = useLocation();
+  const [backRouteList, setBackRouteList] = useState([]);
+  const user = useSelector((state) => state.user.user)
  
-const [items,setItems] = useState([])
-  const getItems = (value) => {
-   setItems(value)
-   }
-   if(!localStorage.getItem("token"))  return <Navigate to="/login"/>
-   
+  useEffect(() => {
+    Promise.all([axios.get("/rights"), axios.get("/children")]).then((value) => {
+      setBackRouteList([...value[0], ...value[1]])
+    })
+  },[]);
+  const {role} = user
+  
   return (
-    
-    <Layout style={{ minHeight: "100%" }}>
+    <div >
+       <Layout style={{ minHeight:"100%"}}>
       <Sider
+      width={200}
         style={{
-          width: 256,
+          minHeight:"100vh"
         }}
       >
-        <LeftNav citems={getItems}></LeftNav>
+        <LeftNav ></LeftNav>
       </Sider>
       <Layout>
         <Header style={{ backgroundColor: "white" }}>
-          <TopHeader items={items} pathname={pathname}></TopHeader>
+         <TopHeader pathname={pathname} items={backRouteList}></TopHeader> 
+          
+         
         </Header>
         <Content style={{ padding: "20px" }}>
           <div style={{ backgroundColor: "white", height: "100%" }}>
-          <Outlet></Outlet>
+            <Routes>
+              {
+            backRouteList.map((item) => {
+                if (
+                  item.pagepermisson &&
+                  LocalRouterMap[item.key] &&
+                  role.rights.includes(item.key)
+                ) {
+                  return (<Route path={item.key} key={item.key} element={LocalRouterMap[item.key]}></Route>)
+                } else {
+                  return null
+                }
+              })}
+             
+              {
+                 backRouteList.length !== 0 ? <Route path="*" element={<NotFound />} ></Route> : null
+               
+              }
+              
+                 <Route path="/" element={<Navigate to="/home"/>}></Route> 
+              
+               
+            </Routes>
           </div>
         </Content>
         <Footer style={{ backgroundColor: "white" }}>Footer</Footer>
       </Layout>
     </Layout>
+    </div>
+
+   
   );
 }
-export default connect(
-  (state) => { 
-    return {
-      user:state.user
-    }
-  } 
-)(NewsSandBox)
